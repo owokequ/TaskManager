@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - include:
+      file: changes/001-create-users.sql
+      relativeToChangelogFile: true
+
+  - include:
+      file: changes/002-create-workspaces.sql
+      relativeToChangelogFile: true
+
+  - include:
+      file: changes/003-create-workspace-members.sql
+      relativeToChangelogFile: true
+
+#   - include:
+#       file: changes/004-create-projects.sql
+#       relativeToChangelogFile: true
+
+#   - include:
+#       file: changes/005-create-tasks.sql
+#       relativeToChangelogFile: true
