@@ -1,18 +1,20 @@
 package com.owoke.taskmanager.user.service.impl;
 
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.owoke.taskmanager.user.api.request.UpdateUserRequest;
 import com.owoke.taskmanager.user.api.response.UserResponse;
 import com.owoke.taskmanager.user.domain.User;
+import com.owoke.taskmanager.user.exception.EmailAlreadyExistsException;
 import com.owoke.taskmanager.user.exception.UserNotFoundException;
+import com.owoke.taskmanager.user.exception.UsernameAlreadyExistsException;
 import com.owoke.taskmanager.user.mapper.UserMapper;
 import com.owoke.taskmanager.user.repository.UserRepository;
 import com.owoke.taskmanager.user.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -43,9 +45,14 @@ public class UserServiceImpl implements UserService {
     public UserResponse updateUser(Long userId, UpdateUserRequest request) {
         log.info("Updating user profile: id={}", userId);
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+        if (userRepository.existsByEmailAndIdNot(request.email(), user.getId())) {
+            throw new EmailAlreadyExistsException(request.email());
+        }
+        if (userRepository.existsByUsernameAndIdNot(request.username(), user.getId())) {
+            throw new UsernameAlreadyExistsException(request.username());
+        }
         user.setEmail(request.email());
         user.setUsername(request.username());
-
         userRepository.flush();
         UserResponse response = userMapper.toResponse(user);
         log.info("User profile updated: id={}", userId);
